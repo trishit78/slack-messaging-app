@@ -2,7 +2,7 @@ import { StatusCodes } from "http-status-codes";
 
 class ClientError extends Error{
     constructor(error){
-        super();
+        super(error);
         this.name = 'ClientError';
         this.message = error.message;
         this.explanation = error.explanation;

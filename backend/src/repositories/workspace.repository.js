@@ -3,9 +3,17 @@ import Workspace from "../schema/workspaceSchema.js";
 import crudRepository from "./crudRepository.js";
 import User from "../schema/user.js";
 import channelRepository from "./channel.repository.js";
+import ClientError from "../utils/errors/clientError.js";
 
 const workspaceRepository = {
   ...crudRepository(Workspace),
+
+  getWorkspaceDetailsById:async function(workspaceId){
+    const workspace = await Workspace.findById(workspaceId).
+    populate('members.memberId','username email avatar').populate('channels','name')
+
+    return workspace;
+  },
   getWorkspaceByName: async function (workspaceName) {
     const workspace = await Workspace.findOne({ name: workspaceName });
     return workspace;
@@ -17,14 +25,16 @@ const workspaceRepository = {
     return workspace;
   },
   getWorkspaceByJoinCode: async function (joinCode) {
-    const workspace = await Workspace.findOne({ joinCode });
+    const workspace = await Workspace.findOne({joinCode} );
+   // console.log('joincode workspaces',workspace);
     if (!workspace) {
-      throw new Error({
+      throw new ClientError({
         success: false,
         explanation: "Invalid join code sent by the client",
         statusCode: StatusCodes.NOT_FOUND,
       });
     }
+    return workspace;
   },
   addMemberToWorkspace: async function (workspaceId , memberId, role ) {
     const workspace = await Workspace.findById(workspaceId);
@@ -78,7 +88,6 @@ const workspaceRepository = {
             statusCode:StatusCodes.NOT_FOUND
         })
     }
-
     const isChannelAlreadyPartOfWorkspace = workspace.channels.find(
         (channel)=> channel.name === channelName
     );
@@ -93,10 +102,9 @@ const workspaceRepository = {
 
     const channel = await channelRepository.create({
         name:channelName,
-        workspaceId:workspaceId
+        workspace:workspaceId
     });
 
-    console.log("channel",channel);
 
     workspace.channels.push(channel);
 
@@ -108,7 +116,7 @@ const workspaceRepository = {
   fetchAllWorkspaceByMemberId: async function(memberId){
     const workspace = await Workspace.find({
         'members.memberId': memberId
-    }).populate('member.memberId', 'username email avatar')
+    }).populate('members.memberId', 'username email avatar')
     return workspace;
 
 
