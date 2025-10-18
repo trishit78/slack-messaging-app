@@ -16,6 +16,14 @@ const workspaceRepository = {
   },
   getWorkspaceByName: async function (workspaceName) {
     const workspace = await Workspace.findOne({ name: workspaceName });
+     if (!workspace) {
+      throw new ClientError({
+        explanation: 'Invalid data sent from the client',
+        message: 'Workspace not found',
+        statusCode: StatusCodes.NOT_FOUND
+      });
+    }
+
     return workspace;
   },
   getWorkspaceById: async function (workspaceId) {
@@ -79,7 +87,7 @@ const workspaceRepository = {
 
 
   addChannelsToWorkspace:async function (workspaceId,channelName) {
-    const workspace = await Workspace.findById(workspaceId);
+    const workspace = await Workspace.findById(workspaceId).populate('channels');
     if(!workspace){
         throw new Error({
             success:false,
@@ -102,7 +110,7 @@ const workspaceRepository = {
 
     const channel = await channelRepository.create({
         name:channelName,
-        workspace:workspaceId
+        workspaceId:workspaceId
     });
 
 
