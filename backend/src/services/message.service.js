@@ -1,5 +1,5 @@
 import { StatusCodes } from "http-status-codes";
-import channelRepository from "../repositories/channel.repository";
+import channelRepository from "../repositories/channel.repository.js";
 import messageRepository from "../repositories/message.repositories.js"
 import ClientError from "../utils/errors/clientError.js";
 import { isUserMemberOfWorkspace } from "./workspace.service.js";
@@ -22,4 +22,11 @@ export const getMessagesService = async(messageParams,page,limit,user)=>{
         limit
     );
     return messages;
-}
+};
+
+
+export const createMessageService = async(message)=>{
+    const newMessage = await messageRepository.create(message);
+    return newMessage;
+};
+

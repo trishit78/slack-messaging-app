@@ -12,9 +12,15 @@ import {ExpressAdapter} from '@bull-board/express';
 import mailQueue from './queues/mail.queue.js';
 import testQueue from './queues/test.queue.js';
 
+import {Server} from 'socket.io';
+import {createServer} from 'http';
+import messageHandlers from './controllers/message.SocketController.js';
 
 
 const app = express();
+const server = createServer(app);
+const io = new Server(server);
+
 
 
 const bullServerAdapter = new ExpressAdapter();
@@ -36,8 +42,17 @@ app.get('/ping',(req,res)=>{
     return res.status(StatusCodes.OK).json({message:'pong'});
 });
 
+io.on('connection',(socket)=>{
+    // console.log('new socket connection ', socket.id);
 
-app.listen(PORT, async()=>{
+    // socket.on('messageFromClient',(data)=>{
+    //     console.log('Message from client',data);
+    //     io.emit('new message',data.toUpperCase());  //broadcasting message
+    // }); 
+    messageHandlers(io,socket);   
+});
+
+server.listen(PORT, async()=>{
     console.log(`server is running on ${PORT}`);
     connectDB();
     // const mailResponse = await mailer.sendMail({
