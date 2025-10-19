@@ -1,4 +1,3 @@
 # slack-messaging-app
 
-
-xplm znmw magn wine
+http://localhost:3000/ui/queue/mailQueue
