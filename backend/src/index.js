@@ -14,7 +14,8 @@ import testQueue from './queues/test.queue.js';
 
 import {Server} from 'socket.io';
 import {createServer} from 'http';
-import messageHandlers from './controllers/message.SocketController.js';
+import messageSocketHandler from './controllers/message.SocketController.js';
+import channelSocketHandler from './controllers/channel.SocketController.js';
 
 
 const app = express();
@@ -49,7 +50,8 @@ io.on('connection',(socket)=>{
     //     console.log('Message from client',data);
     //     io.emit('new message',data.toUpperCase());  //broadcasting message
     // }); 
-    messageHandlers(io,socket);   
+    messageSocketHandler(io,socket);   
+    channelSocketHandler(io,socket);   
 });
 
 server.listen(PORT, async()=>{
